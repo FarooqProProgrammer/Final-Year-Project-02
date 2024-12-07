@@ -5,11 +5,14 @@ import { Server as socketIo } from 'socket.io';
 import chalk from 'chalk'; 
 import connectDb from './config/db.js';
 import authRouter from './routes/auth-routes.js';
-
+import cors from "cors"
 
 dotenv.config();
 
 const app = express();
+
+app.use(express.json())
+app.use(cors())
 
 // MONGO DB CONNECTION
 connectDb();

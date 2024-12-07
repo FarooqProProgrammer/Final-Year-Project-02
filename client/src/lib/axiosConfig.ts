@@ -3,7 +3,7 @@ import axios, {  AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'a
 
 // Create an Axios instance
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:3001/api/auth', // Set the base URL
+    baseURL: 'http://localhost:3001/api', // Set the base URL
     timeout: 10000, // Set the timeout for requests
 });
 
