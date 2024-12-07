@@ -4,22 +4,21 @@ import Register from "./pages/auth/Register"
 import Login from "./pages/auth/Login"
 import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar"
 import { AppSidebar } from "./components/app-sidebar"
+import DashboardProvider from "./components/Provider/DashboardProvider"
 
 const App = () => {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <main>
-      <SidebarTrigger />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-          </Routes>
-        </BrowserRouter>
-      </main>
-    </SidebarProvider>
+
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<DashboardProvider />}>
+          <Route index element={<Dashboard />} />
+        </Route>
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </BrowserRouter>
+
   )
 }
 
