@@ -1,6 +1,6 @@
 import express from "express"
 import multer from "multer"
-import { createProject, deleteManyProjects, getAllProjects, getSingle } from "../controller/project-controller.js";
+import { createProject, deleteManyProjects, getAllProjects, getSingle, updateProject } from "../controller/project-controller.js";
 import path from "path"
 
 const projectRouter = express.Router();
@@ -34,6 +34,7 @@ const upload = multer({ storage, fileFilter, limits: { fileSize: 10 * 1024 * 102
 
 
 projectRouter.post("/create-project", upload.single("projectImage"), createProject)
+projectRouter.put('/update-project/:projectId', upload.single('projectImage'), updateProject);
 projectRouter.get("/get-all-project", getAllProjects)
 projectRouter.get("/get-project/:id", getSingle);
 projectRouter.post('/delete-projects', deleteManyProjects);
