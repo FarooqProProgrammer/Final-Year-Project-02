@@ -17,6 +17,12 @@ const items = [
         icon: Inbox,
     },
     {
+        title: "Projects Status",
+        url: "/project/project-status",
+        icon: Inbox,
+    },
+
+    {
         title: "Calendar",
         url: "#",
         icon: Calendar,

@@ -97,6 +97,32 @@ const getUserDetails = async (req, res) => {
 };
 
 
+
+
+
+
+export const getAllUserDetails = async (req, res) => {
+    try {
+        // Fetch all users from the database
+        const users = await UserModal.find();
+
+        // Map through the users and remove the password field
+        const usersWithoutPassword = users.map(user => {
+            const userObj = user.toObject();
+            delete userObj.password; // Remove password from each user object
+            return userObj;
+        });
+
+        // Return the list of users without their passwords
+        res.status(200).json({ users: usersWithoutPassword });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+
 const logoutUser = (req, res) => {
     try {
         // Invalidate the token on the client-side, if needed

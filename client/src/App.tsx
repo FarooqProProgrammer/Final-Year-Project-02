@@ -8,6 +8,8 @@ import { Toaster } from "./components/ui/toaster";
 import Project from "./pages/dashboard/project";
 import Cookies from 'js-cookie'; // Import js-cookie to handle cookies
 import CreateProject from "./pages/dashboard/project/create-project";
+import ProjectStatus from "./pages/dashboard/project/project-status";
+import EditProject from "./pages/dashboard/project/edit-project";
 
 const queryClient = new QueryClient();
 
@@ -29,8 +31,20 @@ const App = () => {
               path="/project"
               element={authToken ? <Project /> : <Navigate to="/login" />}
             />
+            <Route
+              path="/project/create-project"
+              element={authToken ? <CreateProject /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/project/project-status"
+              element={authToken ? <ProjectStatus /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/project/edit-project/:id"
+              element={authToken ? <EditProject /> : <Navigate to="/login" />}
+            />
 
-            <Route path="/project/create-project" element={<CreateProject />} />
+
           </Route>
 
           {/* If user is logged in, do not allow them to access the login page */}
@@ -38,7 +52,7 @@ const App = () => {
             path="/login"
             element={authToken ? <Navigate to="/dashboard" replace /> : <Login />}
           />
-          
+
           <Route path="/register" element={<Register />} />
         </Routes>
         <Toaster />
