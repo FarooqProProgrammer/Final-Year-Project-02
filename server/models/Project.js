@@ -1,43 +1,52 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
+import slug from "mongoose-slug-updater";
 
+// Initialize the slug plugin
+mongoose.plugin(slug);
 
-
-const projectSchema = new mongoose.Schema({
+const projectSchema = new mongoose.Schema(
+  {
     projectTitle: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
+    },
+    slug: {
+      type: String,
+      slug: "projectTitle",
+      unique: true, // Ensures the slug is unique
     },
     severity: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     startDate: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     endDate: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     projectStatus: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     assignee: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',  
-        required: true, 
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     projectImage: {
-        type: String,
-        required: false,
+      type: String,
+      required: false,
     },
+  },
+  { timestamps: true }
+);
 
-}, { timestamps: true })
-
-const ProjectModel = mongoose.model('Project', projectSchema);
-export default ProjectModel
+const ProjectModel = mongoose.model("Project", projectSchema);
+export default ProjectModel;

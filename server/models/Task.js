@@ -1,4 +1,9 @@
 import mongoose from "mongoose";
+import slug from "mongoose-slug-updater";
+
+// Initialize the slug plugin
+mongoose.plugin(slug);
+
 
 // Define the task schema
 const taskSchema = new mongoose.Schema(
@@ -7,6 +12,11 @@ const taskSchema = new mongoose.Schema(
             type: String,
             required: true,
             trim: true,  // Optional: Ensure no leading/trailing spaces in task name
+        },
+        slug: {
+            type: String,
+            slug: "taskName",
+            unique: true, // Ensures the slug is unique
         },
         taskDescription: {
             type: String,
