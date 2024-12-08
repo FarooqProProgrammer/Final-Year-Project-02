@@ -5,29 +5,52 @@ import { Server as socketIo } from 'socket.io';
 import chalk from 'chalk';
 import connectDb from './config/db.js';
 import authRouter from './routes/auth-routes.js';
-import cors from "cors"
+import cors from "cors";
 import projectRouter from './routes/project-route.js';
-import path from "path"
+import path from "path";
 import { fileURLToPath } from 'url';
-import fs from "fs"
+import fs from "fs";
+import taskRouter from './routes/task-route.js';
+import morgan from 'morgan';
 
 dotenv.config();
 
 const app = express();
 
-app.use(express.json())
-app.use(express.static("uploads"))
-app.use(cors())
+// Morgan setup for logging requests
+const morganFormat = ':method :url :status :response-time ms - :res[content-length]';
+morgan.token('method', (req, res) => {
+    return chalk.bold.green(req.method); // Color the HTTP method
+});
+
+morgan.token('url', (req, res) => {
+    return chalk.blue(req.url); // Color the URL
+});
+
+morgan.token('status', (req, res) => {
+    return chalk.yellow(res.statusCode); // Color the status code
+});
+
+morgan.token('response-time', (req, res) => {
+    return chalk.magenta(`${res.responseTime}ms`); // Color response time
+});
+
+morgan.token('content-length', (req, res) => {
+    return chalk.cyan(res.getHeader('content-length')); // Color content length
+});
+
+app.use(morgan(morganFormat)); // Enable morgan middleware
+
+app.use(express.json());
+app.use(express.static("uploads"));
+app.use(cors());
 
 // MONGO DB CONNECTION
 connectDb();
 
-
 const server = http.createServer(app);
 
-
 const io = new socketIo(server);
-
 
 io.on('connection', (socket) => {
     console.log(chalk.green.bold(`✈️ A new user has connected!`));
@@ -36,9 +59,7 @@ io.on('connection', (socket) => {
         console.log(chalk.blue('Received message from client:'), chalk.yellow(data));
     });
 
-
     socket.emit('welcome', { message: 'Welcome to the server!' });
-
 
     socket.on('disconnect', () => {
         console.log(chalk.red.bold(`✈️ A user has disconnected`));
@@ -50,17 +71,15 @@ app.get('/', (req, res) => {
     res.send('Hello, world!');
 });
 
-
 // ALL APP ROUTES
 app.use('/api/auth', authRouter);
 app.use('/api', projectRouter);
-
+app.use('/api', taskRouter);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const uploadsDir = path.join(__dirname, 'uploads');
-
 
 app.get('/uploads/:filename', (req, res) => {
     const { filename } = req.params;
