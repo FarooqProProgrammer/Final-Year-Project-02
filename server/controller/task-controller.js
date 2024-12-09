@@ -25,6 +25,43 @@ export const createTask = async (req, res) => {
     }
 };
 
+
+export const updateTask = async (req, res) => {
+    try {
+      const { taskId } = req.params; // Get taskId from URL parameters
+      const { taskName, taskDescription, module, taskStatus, project, assignee } = req.body;
+  
+      // Find the task by ID and update it
+      const updatedTask = await Task.findByIdAndUpdate(
+        taskId, // The ID of the task to update
+        {
+          taskName,
+          taskDescription,
+          taskStatus,
+          project,
+          assignee,
+          module
+        },
+        { new: true } // Return the updated task instead of the old one
+      );
+  
+      // If task not found
+      if (!updatedTask) {
+        return res.status(404).json({ message: "Task not found." });
+      }
+  
+      // Send the response
+      res.status(200).json({
+        message: "Task updated successfully!",
+        task: updatedTask,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server error, unable to update task." });
+    }
+  };
+  
+
 // Get tasks by status
 export const getTasksByStatus = async (req, res) => {
     try {

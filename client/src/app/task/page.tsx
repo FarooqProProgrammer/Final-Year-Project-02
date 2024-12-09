@@ -73,7 +73,7 @@ const Projects = () => {
                             <TableCell className="font-medium flex justify-center items-center">
                                 <div className="flex justify-center items-center gap-5">
                                     <Trash2 className='cursor-pointer' onClick={()=>handleDeleteTask(item?._id)} />
-                                    <PencilIcon className='cursor-pointer' />
+                                    <PencilIcon className='cursor-pointer' onClick={()=>router.push(`/task/update-task/${item?._id}`)} />
                                 </div>
                             </TableCell>
                         </TableRow>

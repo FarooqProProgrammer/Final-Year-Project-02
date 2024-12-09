@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link";
 import {
   Activity,
@@ -26,12 +27,40 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Currency from "@/components/currancy";
+import { useLazyGetReportQuery } from "@/store/services/apiSlice";
 
 export default function Dashboard() {
+
+   const [triggerGetReport] = useLazyGetReportQuery();
+
+
+
+   const handleDownloadReport = async () => {
+    try {
+      // Make the API call to fetch the report
+      const response = await triggerGetReport().unwrap();
+      console.log(response.fileUrl); // Ensure that the fileUrl is present in the response
+  
+      // Create an anchor element
+      const a = document.createElement('a');
+      a.href = response.fileUrl; // Set the href to the URL received from the response
+      a.target = '_blank'; // Open the link in a new tab
+      a.click(); // Simulate a click to open the link
+  
+    } catch (error) {
+      console.error("Error downloading the report:", error);
+    }
+  };
+  
+  
+  
+
+
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
       <div>
-        <Button>Download Report</Button>
+        <Button onClick={handleDownloadReport}>Download Report</Button>
       </div>
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         <Card x-chunk="dashboard-01-chunk-0">

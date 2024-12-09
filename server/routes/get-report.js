@@ -2,10 +2,13 @@ import express from "express";
 import path from "path";
 import ejs from "ejs";
 import pdf from "html-pdf";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import Task from "../models/Task.js";
 
 const reportRouter = express.Router();
+
+
 
 reportRouter.get("/get-report", async (req, res) => {
     try {
@@ -21,26 +24,28 @@ reportRouter.get("/get-report", async (req, res) => {
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
 
-        // Set the response headers for PDF
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", 'attachment; filename="report.pdf"');
-
         // Render the HTML with the data using EJS
         const ejsData = {
             generatedOn: new Date().toLocaleString(),
             tableData: tableData,
         };
 
-        const html = await ejs.renderFile(path.join(__dirname, '../views/report.ejs'), ejsData);
+        const html = await ejs.renderFile(path.join(__dirname, "../views/report.ejs"), ejsData);
 
-        // Generate the PDF from the HTML content
-        pdf.create(html, { format: 'A4' }).toBuffer((err, pdfBuffer) => {
+        // Define the output PDF file path in the "upload" folder
+        const fileName = `report_${Date.now()}.pdf`;  // Unique file name using timestamp
+        const outputFilePath = path.join(__dirname, "../uploads", fileName);
+
+        // Generate the PDF and save it to the "upload" folder
+        pdf.create(html, { format: "A4" }).toFile(outputFilePath, (err) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send("Error generating PDF");
             }
-            // Send the generated PDF as a response
-            res.send(pdfBuffer);
+
+            // Return the file URL to the client
+            const fileUrl = `http://localhost:3001/uploads/${fileName}`;
+            res.json({ fileUrl: fileUrl });
         });
     } catch (err) {
         console.error(err);

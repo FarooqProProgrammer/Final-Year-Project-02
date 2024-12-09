@@ -14,6 +14,7 @@ import taskRouter from './routes/task-route.js';
 import morgan from 'morgan';
 import reportRouter from './routes/get-report.js';
 import ejs from "ejs"
+import chartReportRouter from './routes/chart-report.js';
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.use(morgan(morganFormat)); // Enable morgan middleware
 
 app.use(express.json());
 app.use(express.static("uploads"));
+app.use(express.static("public"));
 app.use(cors());
 
 // MONGO DB CONNECTION
@@ -93,6 +95,7 @@ app.use('/api/auth', authRouter);
 app.use('/api', projectRouter);
 app.use('/api', taskRouter);
 app.use('/api', reportRouter);
+app.use('/api', chartReportRouter);
 
 app.get('/uploads/:filename', (req, res) => {
     const { filename } = req.params;
