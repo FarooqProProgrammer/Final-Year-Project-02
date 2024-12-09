@@ -12,6 +12,8 @@ import { fileURLToPath } from 'url';
 import fs from "fs";
 import taskRouter from './routes/task-route.js';
 import morgan from 'morgan';
+import reportRouter from './routes/get-report.js';
+import ejs from "ejs"
 
 dotenv.config();
 
@@ -71,15 +73,26 @@ app.get('/', (req, res) => {
     res.send('Hello, world!');
 });
 
-// ALL APP ROUTES
-app.use('/api/auth', authRouter);
-app.use('/api', projectRouter);
-app.use('/api', taskRouter);
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const uploadsDir = path.join(__dirname, 'uploads');
+
+app.set('view engine', 'ejs');
+
+app.use(express.static("views"))
+
+
+
+
+
+// ALL APP ROUTES
+app.use('/api/auth', authRouter);
+app.use('/api', projectRouter);
+app.use('/api', taskRouter);
+app.use('/api', reportRouter);
 
 app.get('/uploads/:filename', (req, res) => {
     const { filename } = req.params;

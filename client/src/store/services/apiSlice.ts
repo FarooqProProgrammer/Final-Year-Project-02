@@ -14,6 +14,15 @@ export const apiSlice = createApi({
       query: () => '/auth/get-all-users',  // Using the route '/auth/get-all-users'
     }),
 
+    // Endpoint for getting all products/projects
+    getAllProducts: builder.query<any, void>({
+      query: () => '/get-all-project',  // Using the route '/get-all-project'
+    }),
+    getAllTask: builder.query<any, void>({
+      query: () => '/tasks',  // Using the route '/get-all-project'
+    }),
+
+
     // Endpoint for user registration
     registerUser: builder.mutation<any, { email: string; password: string; username: string }>({
       query: (userData) => ({
@@ -23,11 +32,6 @@ export const apiSlice = createApi({
       }),
     }),
 
-    getAllProducts: builder.query<any, void>({
-        query: () => '/get-all-project',  // Using the route '/auth/get-all-users'
-      }),
-  
-
     // Endpoint for user login
     loginUser: builder.mutation<any, { email: string; password: string }>({
       query: (credentials) => ({
@@ -36,6 +40,31 @@ export const apiSlice = createApi({
         body: credentials,
       }),
     }),
+
+    // New mutation for creating a task
+    createTask: builder.mutation<any, {
+      taskName: string;
+      priority: string;
+      taskStartDate: string;
+      taskEndDate: string;
+      taskStatus: string;
+      assignee: string;
+      project: string; // Optional
+      module: string; // Optional
+    }>({
+      query: (taskData) => ({
+        url: '/task',  // Assuming this is the endpoint for creating a task
+        method: 'POST',
+        body: taskData,
+      }),
+    }),
+
+    deleteTask: builder.mutation<any, string>({
+        query: (taskId) => ({
+          url: `/task/${taskId}`, // Assuming '/task/:id' is the delete route
+          method: 'POST',
+        }),
+      }),
 
     // Updated endpoint for creating a project with image upload and other fields
     createProject: builder.mutation<any, {
@@ -47,7 +76,7 @@ export const apiSlice = createApi({
       assignee: string;
       userId: string;
       projectImage: File;
-    }>({
+    }>( {
       query: (projectData) => {
         const formData = new FormData();
         formData.append('projectTitle', projectData.projectTitle);
@@ -70,11 +99,14 @@ export const apiSlice = createApi({
 });
 
 // Export hooks for usage in functional components
-export const { 
-  useGetUsersQuery, 
-  useRegisterUserMutation, 
-  useLoginUserMutation, 
-  useCreateProjectMutation, 
+export const {
+  useGetUsersQuery,
+  useRegisterUserMutation,
+  useLoginUserMutation,
+  useCreateProjectMutation,
+  useCreateTaskMutation, // Export the new hook
   useGetAllProductsQuery,
-  useGetAllUserDetailsQuery  // Export the new hook
+  useGetAllUserDetailsQuery,
+  useGetAllTaskQuery,
+  useDeleteTaskMutation
 } = apiSlice;

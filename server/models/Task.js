@@ -23,10 +23,16 @@ const taskSchema = new mongoose.Schema(
             required: true,
             trim: true,  // Optional: Trim spaces for description
         },
+        module: {
+            type: String,
+            required: true,
+            trim: true,  // Optional: Trim spaces for description
+        },
+
         taskStatus: {
             type: String,
             required: true,
-            enum: ['not started', 'in progress', 'completed'], // Valid statuses
+    
             default: 'not started', // Default value
         },
         project: {

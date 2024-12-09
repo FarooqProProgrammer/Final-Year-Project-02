@@ -3,7 +3,7 @@ import Task from "../models/Task.js";
 // Create a new task
 export const createTask = async (req, res) => {
     try {
-        const { taskName, taskDescription, taskStatus, project, assignee } = req.body;
+        const { taskName, taskDescription,module, taskStatus, project, assignee } = req.body;
 
         const newTask = new Task({
             taskName,
@@ -11,6 +11,7 @@ export const createTask = async (req, res) => {
             taskStatus,
             project,
             assignee,
+            module
         });
 
         await newTask.save();
@@ -116,5 +117,27 @@ export const getTasksByProject = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Server error, unable to fetch tasks." });
+    }
+};
+
+
+export const deleteTask = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find the task by ID and delete it
+        const deletedTask = await Task.findByIdAndDelete(id);
+
+        if (!deletedTask) {
+            return res.status(404).json({ message: "Task not found." });
+        }
+
+        res.status(200).json({
+            message: "Task deleted successfully!",
+            task: deletedTask,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error, unable to delete task." });
     }
 };

@@ -1,8 +1,9 @@
 import express from "express"
-import { createTask, getAllTasks, getTaskById, getTasksByProject, getTasksByStatus, updateTaskStatus } from "../controller/task-controller.js";
+import { createTask, deleteTask, getAllTasks, getTaskById, getTasksByProject, getTasksByStatus, updateTaskStatus } from "../controller/task-controller.js";
 const taskRouter = express.Router();
 
 taskRouter.post('/task',createTask);
+taskRouter.post('/task/:id',deleteTask);
 taskRouter.get("/task/status/:status", getTasksByStatus);
 taskRouter.get("/task/:taskId", getTaskById);
 taskRouter.put("/task/:taskId/status", updateTaskStatus);

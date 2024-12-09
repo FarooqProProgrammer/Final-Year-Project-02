@@ -4,6 +4,9 @@ export const createProject = async (req, res) => {
     try {
         const { projectTitle, severity, startDate, endDate, projectStatus, assignee, userId } = req.body;
 
+        console.log(req.body)
+
+
         let projectImageUrl = '';
         if (req.file) {
             // If a file is uploaded, get its URL

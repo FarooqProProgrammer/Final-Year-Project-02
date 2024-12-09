@@ -1,8 +1,9 @@
 import UserModal from "../models/User.js";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";  // Import bcrypt
 
 
+// Register user
 const registerUser = async (req, res) => {
     const { username, email, password, roles } = req.body;
 
@@ -12,20 +13,15 @@ const registerUser = async (req, res) => {
             return res.status(400).json({ message: "User already exists" });
         }
 
-        // Ensure password is provided before hashing
+        // Ensure password is provided
         if (!password) {
             return res.status(400).json({ message: "Password is required" });
         }
 
-        // Generate salt for bcrypt (you can change the salt rounds, 10 is a good default)
-        const salt = await bcrypt.genSalt(10);
-        // Hash the password with the salt
-        const hashedPassword = await bcrypt.hash(password, salt);
-
         const newUser = new UserModal({
             username,
             email,
-            password: hashedPassword,
+            password, // Save the password as it is
             roles: roles || ['user'], // Default to 'user' role if not provided
         });
 
@@ -42,28 +38,36 @@ const registerUser = async (req, res) => {
     }
 };
 
-
-
-
 // Login user and get a token
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
-    console.log(req.body);
+    console.log("Request Body:", req.body);
 
     try {
-        const user = await UserModal.findOne({ email });
+        const normalizedEmail = email.trim().toLowerCase();
+        const user = await UserModal.findOne({ email: normalizedEmail });
+
         if (!user) {
             return res.status(400).json({ message: "Invalid email or password" });
         }
 
+        console.log(user.password);
+        console.log(password);
+
+        // Compare the provided password with the stored hashed password using bcrypt
         const isMatch = await bcrypt.compare(password, user.password);
+
         if (!isMatch) {
+            console.log("Password mismatch");
             return res.status(400).json({ message: "Invalid email or password" });
         }
 
-        // Create JWT token
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'JWT_SECRET', { expiresIn: '1h' });
+        const token = jwt.sign(
+            { id: user._id },
+            process.env.JWT_SECRET || 'JWT_SECRET',
+            { expiresIn: '1h' }
+        );
 
         res.json({
             message: "Login successful",
@@ -72,14 +76,13 @@ const loginUser = async (req, res) => {
                 username: user.username,
                 email: user.email,
                 roles: user.roles,
-            }
+            },
         });
     } catch (error) {
+        console.error("Error during login:", error);
         res.status(500).json({ message: error.message });
     }
 };
-
-
 
 // Get the authenticated user details
 const getUserDetails = async (req, res) => {
@@ -95,11 +98,6 @@ const getUserDetails = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
-
-
-
-
 
 export const getAllUserDetails = async (req, res) => {
     try {
@@ -121,8 +119,6 @@ export const getAllUserDetails = async (req, res) => {
     }
 };
 
-
-
 const logoutUser = (req, res) => {
     try {
         // Invalidate the token on the client-side, if needed
@@ -132,7 +128,5 @@ const logoutUser = (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
-
 
 export { registerUser, loginUser, getUserDetails };
