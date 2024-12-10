@@ -34,10 +34,34 @@ export const createProject = async (req, res) => {
     }
 }
 
+
+export const deleteProduct = async (req, res) => {
+    try {
+        const { id } = req.params;  // Get the product ID from the URL parameters
+
+        // Find and delete the product
+        const deletedProduct = await ProjectModel.findByIdAndDelete(id);
+
+        // If no product is found, send a 404 response
+        if (!deletedProduct) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Send success response
+        return res.status(200).json({ message: 'Product deleted successfully', product: deletedProduct });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Failed to delete product', error: error.message });
+    }
+};
+
 export const updateProject = async (req, res) => {
     try {
-        const { projectId } = req.params; // Assuming you are passing project ID in the URL parameter
+        const { projectId } = req.params; // Get the project ID from the URL parameter
         const { projectTitle, severity, startDate, endDate, projectStatus, assignee, userId } = req.body;
+
+
+        console.log({...req.body,projectId})
 
         // Find the project by its ID
         const project = await ProjectModel.findById(projectId);
@@ -45,22 +69,7 @@ export const updateProject = async (req, res) => {
             return res.status(404).json({ message: 'Project not found' });
         }
 
-        // Process new image if uploaded
-        let projectImageUrl = project.projectImage; // Keep the old image URL if no new image is uploaded
-        if (req.file) {
-            // If a new file is uploaded, delete the old image if it exists
-            if (projectImageUrl) {
-                const oldImagePath = path.join(__dirname, `..${projectImageUrl}`);
-                if (fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath); // Delete the old image from the server
-                }
-            }
-            
-            // Set the new image URL
-            projectImageUrl = `/uploads/${req.file.filename}`;
-        }
-
-        // Update project fields with new data (and new image URL if applicable)
+        // Update project fields with new data, but don't modify the image field
         project.projectTitle = projectTitle;
         project.severity = severity;
         project.startDate = startDate;
@@ -68,7 +77,6 @@ export const updateProject = async (req, res) => {
         project.projectStatus = projectStatus;
         project.assignee = assignee;
         project.userId = userId;
-        project.projectImage = projectImageUrl; // Save the updated image URL
 
         // Save the updated project to the database
         await project.save();

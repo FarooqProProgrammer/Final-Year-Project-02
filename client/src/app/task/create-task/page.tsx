@@ -7,7 +7,16 @@ import { Button } from '@/components/ui/button';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useCreateTaskMutation, useGetAllProductsQuery, useGetAllUserDetailsQuery } from '@/store/services/apiSlice';
 import { useRouter } from 'next/navigation';
+import { Textarea } from '@/components/ui/textarea';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from "@/components/ui/select"
 
+  
 interface FormValues {
     taskName: string;
     priority: string;
@@ -37,6 +46,8 @@ const CreateTask: React.FC = () => {
     // Handle form submission
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         console.log(data);
+
+
         // Add your task creation logic here
         try {
             const response = await createTask(data).unwrap();
@@ -54,7 +65,7 @@ const CreateTask: React.FC = () => {
 
     return (
         <div className="sm:px-20">
-            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-3">
+            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-3">
                 {/* Task Name */}
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label>Task Name</Label>
@@ -155,7 +166,7 @@ const CreateTask: React.FC = () => {
                 {/* Task Description */}
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label>Task Description</Label>
-                    <textarea
+                    <Textarea
                         {...register('taskDescription', { required: 'Task Description is required' })}
                         placeholder="Enter Task Description"
                         className="input"
@@ -164,9 +175,9 @@ const CreateTask: React.FC = () => {
                 </div>
 
                 {/* Submit Button */}
-                <div>
-                    <Button type="submit" onClick={handleSubmit(onSubmit)} disabled={isLoading}>Submit</Button>
-                </div>
+            </div>
+            <div className='mt-2'>
+                <Button type="submit" onClick={handleSubmit(onSubmit)} disabled={isLoading}>Submit</Button>
             </div>
         </div>
     );

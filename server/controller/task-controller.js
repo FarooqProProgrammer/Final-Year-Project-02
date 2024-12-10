@@ -3,7 +3,7 @@ import Task from "../models/Task.js";
 // Create a new task
 export const createTask = async (req, res) => {
     try {
-        const { taskName, taskDescription,module, taskStatus, project, assignee } = req.body;
+        const { taskName,taskStartDate,taskEndDate, taskDescription,module, taskStatus, project, assignee } = req.body;
 
         const newTask = new Task({
             taskName,
@@ -11,7 +11,9 @@ export const createTask = async (req, res) => {
             taskStatus,
             project,
             assignee,
-            module
+            module,
+            taskStartDate,
+            taskEndDate
         });
 
         await newTask.save();

@@ -33,12 +33,12 @@ const projectSchema = new mongoose.Schema(
     },
     assignee: {
       type: String,
-      required: true,
+    
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+    
     },
     projectImage: {
       type: String,

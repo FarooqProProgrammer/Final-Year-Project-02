@@ -23,6 +23,15 @@ const taskSchema = new mongoose.Schema(
             required: true,
             trim: true,  // Optional: Trim spaces for description
         },
+         taskStartDate: {
+            type: String,
+            trim: true,  // Optional: Trim spaces for description
+        },
+         taskEndDate: {
+            type: String,
+            trim: true,  // Optional: Trim spaces for description
+        },
+        
         module: {
             type: String,
             required: true,
