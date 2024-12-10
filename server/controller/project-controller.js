@@ -35,6 +35,24 @@ export const createProject = async (req, res) => {
 }
 
 
+export const getAllProjectCount = async (req, res) => {
+    try {
+        // Fetch the most recent 4 projects, sorted by creation date (descending order)
+        const recentProjects = await ProjectModel.find()
+            .sort({ createdAt: -1 }) // Sorting by descending order of the createdAt field
+            .limit(4); // Limiting to the top 4 results
+
+        // Send the response with the projects
+        res.status(200).json(recentProjects);
+    } catch (error) {
+        // Handle any errors
+        console.error("Error fetching recent projects:", error);
+        res.status(500).json({ error: "An error occurred while fetching projects." });
+    }
+};
+
+
+
 export const deleteProduct = async (req, res) => {
     try {
         const { id } = req.params;  // Get the product ID from the URL parameters

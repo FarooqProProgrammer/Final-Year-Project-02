@@ -27,33 +27,41 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Currency from "@/components/currancy";
-import { useLazyGetReportQuery } from "@/store/services/apiSlice";
+import { useGetAllProductsQuery, useGetProjectCountsQuery, useGetTotalCountsQuery, useLazyGetReportQuery } from "@/store/services/apiSlice";
+import { useEffect } from "react";
 
 export default function Dashboard() {
 
-   const [triggerGetReport] = useLazyGetReportQuery();
+  const [triggerGetReport] = useLazyGetReportQuery();
 
 
+  const { data, isLoading } = useGetTotalCountsQuery();
+  const { data: projectData, isLoading: projectLoading } = useGetAllProductsQuery();
 
-   const handleDownloadReport = async () => {
+  useEffect(() => {
+    console.log(projectData)
+  }, [projectData])
+
+
+  const handleDownloadReport = async () => {
     try {
       // Make the API call to fetch the report
       const response = await triggerGetReport().unwrap();
       console.log(response.fileUrl); // Ensure that the fileUrl is present in the response
-  
+
       // Create an anchor element
       const a = document.createElement('a');
       a.href = response.fileUrl; // Set the href to the URL received from the response
       a.target = '_blank'; // Open the link in a new tab
       a.click(); // Simulate a click to open the link
-  
+
     } catch (error) {
       console.error("Error downloading the report:", error);
     }
   };
-  
-  
-  
+
+
+
 
 
 
@@ -65,52 +73,46 @@ export default function Dashboard() {
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         <Card x-chunk="dashboard-01-chunk-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
+
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              <Currency value={45231.89} />
+              <Currency value={data?.project} />
             </div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% from last month
-            </p>
           </CardContent>
         </Card>
-        <Card x-chunk="dashboard-01-chunk-1">
+        <Card x-chunk="dashboard-01-chunk-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Subscriptions</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Total Task</CardTitle>
+
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+2350</div>
-            <p className="text-xs text-muted-foreground">
-              +180.1% from last month
-            </p>
+            <div className="text-2xl font-bold">
+              <Currency value={data?.TaskCount} />
+            </div>
           </CardContent>
         </Card>
-        <Card x-chunk="dashboard-01-chunk-2">
+        <Card x-chunk="dashboard-01-chunk-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sales</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Total Completed Task</CardTitle>
+
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+12,234</div>
-            <p className="text-xs text-muted-foreground">
-              +19% from last month
-            </p>
+            <div className="text-2xl font-bold">
+              <Currency value={data?.completedTask} />
+            </div>
           </CardContent>
         </Card>
-        <Card x-chunk="dashboard-01-chunk-3">
+        <Card x-chunk="dashboard-01-chunk-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Now</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Total In Progress Task</CardTitle>
+
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+573</div>
-            <p className="text-xs text-muted-foreground">
-              +201 since last hour
-            </p>
+            <div className="text-2xl font-bold">
+              <Currency value={data?.InProgress} />
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -118,13 +120,13 @@ export default function Dashboard() {
         <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
           <CardHeader className="flex flex-row items-center">
             <div className="grid gap-2">
-              <CardTitle>Transactions</CardTitle>
+              <CardTitle>Projects</CardTitle>
               <CardDescription>
-                Recent transactions from your store.
+                Recent Projects.
               </CardDescription>
             </div>
             <Button asChild size="sm" className="ml-auto gap-1">
-              <Link href="#">
+              <Link href="/projects">
                 View All
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
@@ -134,110 +136,37 @@ export default function Dashboard() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Customer</TableHead>
+                  <TableHead>Project Title</TableHead>
                   <TableHead className="hidden xl:table-column">Type</TableHead>
                   <TableHead className="hidden xl:table-column">
                     Status
                   </TableHead>
                   <TableHead className="hidden xl:table-column">Date</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="text-right">End Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell>
-                    <div className="font-medium">Liam Johnson</div>
-                    <div className="hidden text-sm text-muted-foreground md:inline">
-                      liam@example.com
-                    </div>
-                  </TableCell>
-                  <TableCell className="hidden xl:table-column">Sale</TableCell>
-                  <TableCell className="hidden xl:table-column">
-                    <Badge className="text-xs" variant="outline">
-                      Approved
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell lg:hidden xl:table-column">
-                    2023-06-23
-                  </TableCell>
-                  <TableCell className="text-right">$250.00</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>
-                    <div className="font-medium">Olivia Smith</div>
-                    <div className="hidden text-sm text-muted-foreground md:inline">
-                      olivia@example.com
-                    </div>
-                  </TableCell>
-                  <TableCell className="hidden xl:table-column">
-                    Refund
-                  </TableCell>
-                  <TableCell className="hidden xl:table-column">
-                    <Badge className="text-xs" variant="outline">
-                      Declined
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell lg:hidden xl:table-column">
-                    2023-06-24
-                  </TableCell>
-                  <TableCell className="text-right">$150.00</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>
-                    <div className="font-medium">Noah Williams</div>
-                    <div className="hidden text-sm text-muted-foreground md:inline">
-                      noah@example.com
-                    </div>
-                  </TableCell>
-                  <TableCell className="hidden xl:table-column">
-                    Subscription
-                  </TableCell>
-                  <TableCell className="hidden xl:table-column">
-                    <Badge className="text-xs" variant="outline">
-                      Approved
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell lg:hidden xl:table-column">
-                    2023-06-25
-                  </TableCell>
-                  <TableCell className="text-right">$350.00</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>
-                    <div className="font-medium">Emma Brown</div>
-                    <div className="hidden text-sm text-muted-foreground md:inline">
-                      emma@example.com
-                    </div>
-                  </TableCell>
-                  <TableCell className="hidden xl:table-column">Sale</TableCell>
-                  <TableCell className="hidden xl:table-column">
-                    <Badge className="text-xs" variant="outline">
-                      Approved
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell lg:hidden xl:table-column">
-                    2023-06-26
-                  </TableCell>
-                  <TableCell className="text-right">$450.00</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>
-                    <div className="font-medium">Liam Johnson</div>
-                    <div className="hidden text-sm text-muted-foreground md:inline">
-                      liam@example.com
-                    </div>
-                  </TableCell>
-                  <TableCell className="hidden xl:table-column">Sale</TableCell>
-                  <TableCell className="hidden xl:table-column">
-                    <Badge className="text-xs" variant="outline">
-                      Approved
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell lg:hidden xl:table-column">
-                    2023-06-27
-                  </TableCell>
-                  <TableCell className="text-right">$550.00</TableCell>
-                </TableRow>
+                {
+                  projectData?.projects?.map((item, index) => {
+                    return (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <div className="hidden text-sm text-muted-foreground md:inline">
+                          {item?.projectTitle}
+                          </div>
+                        </TableCell>
+                        <TableCell></TableCell>
+                        <TableCell className="text-end">
+                          <div className="hidden   text-sm text-muted-foreground md:inline">
+                          {item?.endDate}
+                          </div>
+                        </TableCell>
+
+                
+                      </TableRow>
+                    )
+                  })
+                }
               </TableBody>
             </Table>
           </CardContent>

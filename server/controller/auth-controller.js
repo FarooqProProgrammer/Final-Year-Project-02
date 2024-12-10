@@ -18,11 +18,17 @@ const registerUser = async (req, res) => {
             return res.status(400).json({ message: "Password is required" });
         }
 
+        let avatarUrl = "";
+        if (req.file) {
+            avatarUrl = `/uploads/avatars/${req.file.filename}`; // Save the file path
+        }
+
         const newUser = new UserModal({
             username,
             email,
             password, // Save the password as it is
             roles: roles || ['user'], // Default to 'user' role if not provided
+            avatar: avatarUrl,
         });
 
         await newUser.save();
@@ -69,6 +75,14 @@ const loginUser = async (req, res) => {
             { expiresIn: '1h' }
         );
 
+        req.session.user = {
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            roles: user.roles,
+            avatar: user.avatar,
+        };
+
         res.json({
             message: "Login successful",
             token,
@@ -76,6 +90,7 @@ const loginUser = async (req, res) => {
                 username: user.username,
                 email: user.email,
                 roles: user.roles,
+                avatar: user.avatar,
             },
         });
     } catch (error) {
@@ -121,12 +136,16 @@ export const getAllUserDetails = async (req, res) => {
 
 const logoutUser = (req, res) => {
     try {
-        // Invalidate the token on the client-side, if needed
-        // You can't invalidate JWTs server-side unless you maintain a blacklist
-        res.json({ message: "Logged out successfully" });
+        // Destroy the session
+        req.session.destroy((err) => {
+            if (err) {
+                return res.status(500).json({ message: "Error while logging out" });
+            }
+            res.json({ message: "Logged out successfully" });
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-export { registerUser, loginUser, getUserDetails };
+export { registerUser, loginUser, getUserDetails,logoutUser };

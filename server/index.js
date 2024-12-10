@@ -13,12 +13,33 @@ import fs from "fs";
 import taskRouter from './routes/task-route.js';
 import morgan from 'morgan';
 import reportRouter from './routes/get-report.js';
-import ejs from "ejs"
-import chartReportRouter from './routes/chart-report.js';
+import ejs from "ejs";
+import session from "express-session";
+import MongoStore from 'connect-mongo';  // Import connect-mongo
+import chartReportRouter from "./routes/chart-report.js"
+import ProjectSeverityRoutes from "./routes/project-severity-routes.js"
+
 
 dotenv.config();
 
 const app = express();
+
+// MongoDB session store setup using connect-mongo
+app.set('trust proxy', 1);
+app.use(session({
+    secret: process.env.SESSION_SECRET, // Secret for session encryption
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: true, // Set to true if using HTTPS
+        maxAge: 60000 // Session cookie expiration time in milliseconds
+    },
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGO_URI, // MongoDB connection string from env
+        collectionName: 'sessions', // Optional collection name
+        ttl: 14 * 24 * 60 * 60 // Session time-to-live (TTL) in seconds (e.g., 14 days)
+    })
+}));
 
 // Morgan setup for logging requests
 const morganFormat = ':method :url :status :response-time ms - :res[content-length]';
@@ -75,8 +96,6 @@ app.get('/', (req, res) => {
     res.send('Hello, world!');
 });
 
-
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -84,11 +103,7 @@ const uploadsDir = path.join(__dirname, 'uploads');
 
 app.set('view engine', 'ejs');
 
-app.use(express.static("views"))
-
-
-
-
+app.use(express.static("views"));
 
 // ALL APP ROUTES
 app.use('/api/auth', authRouter);
@@ -96,6 +111,7 @@ app.use('/api', projectRouter);
 app.use('/api', taskRouter);
 app.use('/api', reportRouter);
 app.use('/api', chartReportRouter);
+app.use('/api', ProjectSeverityRoutes)
 
 app.get('/uploads/:filename', (req, res) => {
     const { filename } = req.params;

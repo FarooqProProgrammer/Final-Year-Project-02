@@ -70,6 +70,19 @@ export default function NavBar() {
           </TooltipTrigger>
           <TooltipContent side="right">Task</TooltipContent>
         </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href="/severity"
+              className={`flex h-9 w-9 items-center justify-center rounded-lg text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8 ${pathname === "/products" ? "bg-accent" : ""}`}
+            >
+              <BookAIcon className="h-5 w-5" />
+              <span className="sr-only">Severity</span>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="right">Severity</TooltipContent>
+        </Tooltip>
+
 
       
       </nav>

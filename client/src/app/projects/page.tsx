@@ -87,9 +87,9 @@ const Projects = () => {
   };
 
   return (
-    <section className="sm:px-20 space-y-4">
+    <section className="lg:px-20 sm:px-10 space-y-4">
       <div className="flex justify-end items-center">
-        <Button onClick={() => router.push("/project/create-project")}>
+        <Button onClick={() => router.push("/projects/create-project")}>
           Create Project
         </Button>
       </div>

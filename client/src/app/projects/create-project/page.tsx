@@ -24,12 +24,12 @@ const CreateProject: React.FC = () => {
     const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormValues>();
     const [createProject, { isLoading, isSuccess, isError, error }] = useCreateProjectMutation();
 
-    const { data:usersData } = useGetAllUserDetailsQuery()
+    const { data: usersData } = useGetAllUserDetailsQuery()
     const router = useRouter()
 
-    useEffect(()=>{
+    useEffect(() => {
         console.log(usersData)
-    },[usersData])
+    }, [usersData])
 
 
 
@@ -37,14 +37,14 @@ const CreateProject: React.FC = () => {
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         console.log(data);
 
-      
+
 
 
         const response = await createProject(data).unwrap();
 
         console.log(isSuccess)
 
-        if(isSuccess) { 
+        if (isSuccess) {
             router.push("/projects")
         }
     };
@@ -142,18 +142,20 @@ const CreateProject: React.FC = () => {
                     /> */}
                     <select {...register('userId', { required: 'User ID is required' })} id="">
                         {
-                            usersData?.users?.map((item,index)=>{return(
-                                <option value={item?._id}>{item?.username}</option>
-                            )})
+                            usersData?.users?.map((item, index) => {
+                                return (
+                                    <option value={item?._id}>{item?.username}</option>
+                                )
+                            })
                         }
                     </select>
                     {errors.userId && <p className="text-red-500 text-sm">{errors.userId.message}</p>}
                 </div>
 
                 {/* Submit Button */}
-                <div>
-                    <Button type="submit" onClick={handleSubmit(onSubmit)}>Submit</Button>
-                </div>
+            </div>
+            <div className='mt-4'>
+                <Button type="submit" onClick={handleSubmit(onSubmit)}>Submit</Button>
             </div>
         </div>
     );

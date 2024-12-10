@@ -4,10 +4,7 @@ export default function Currency({ value }: { value: number }) {
 
   return (
     <div>
-      {new Intl.NumberFormat(locale, {
-        style: "currency",
-        currency: currency,
-      }).format(value)}
+      {value}
     </div>
   );
 }

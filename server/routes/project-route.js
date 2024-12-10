@@ -1,7 +1,10 @@
 import express from "express"
 import multer from "multer"
-import { createProject, deleteManyProjects, deleteProduct, getAllProjects, getSingle, updateProject } from "../controller/project-controller.js";
+import { createProject, deleteManyProjects, deleteProduct, getAllProjectCount, getAllProjects, getSingle, updateProject } from "../controller/project-controller.js";
 import path from "path"
+import Task from "../models/Task.js";
+import ProjectModel from "../models/Project.js";
+
 
 const projectRouter = express.Router();
 
@@ -34,11 +37,31 @@ const upload = multer({ storage, fileFilter, limits: { fileSize: 10 * 1024 * 102
 
 
 projectRouter.post("/create-project", upload.single("projectImage"), createProject)
-projectRouter.put('/update-project/:projectId',  updateProject);
+projectRouter.put('/update-project/:projectId', updateProject);
 projectRouter.get("/get-all-project", getAllProjects)
+projectRouter.get("/get-all-project-count", getAllProjectCount)
 projectRouter.get("/get-project/:id", getSingle);
 projectRouter.post('/delete-projects', deleteManyProjects);
 projectRouter.delete('/delete-project/:id', deleteProduct);
+
+
+projectRouter.get('/total-counts', async (req, res) => {
+    try {
+        const totalCounts = await ProjectModel.countDocuments();
+        const TaskCount = await Task.countDocuments();
+
+        const TaskCompleted = await Task.find({ taskStatus: 'Completed' }).countDocuments();
+        const InProgress = await Task.find({ taskStatus: 'In Progress' }).countDocuments();
+
+
+        res.status(200).json({ project: totalCounts, TaskCount, completedTask: TaskCompleted ,InProgress});
+
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to retrieve total counts', error: error.message });
+    }
+})
 
 
 export default projectRouter

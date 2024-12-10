@@ -40,11 +40,10 @@ const Login: React.FC = () => {
             // Set token in cookies (with a 1-day expiration, secure, HttpOnly flag can be added if needed)
             
             // Show success toast when login is successful
-            if (isSuccess) {
+            if (response) {
                 Cookies.set('auth_token', token, { expires: 1, secure: true, sameSite: 'Strict' });
                 toast.success('Login successful!');
-                router.push("/product")
-
+                router.push("/projects")
             }
 
         } catch (error) {

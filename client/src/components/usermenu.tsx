@@ -1,3 +1,4 @@
+"use client"
 import Image from "next/image";
 import {
   DropdownMenu,
@@ -8,8 +9,24 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "./ui/button";
+import Cookies from 'js-cookie';  // Import js-cookie
+import { useRouter } from "next/navigation"
+import { signOut } from "next-auth/react";
+
+
 
 export default function UserMenu() {
+
+
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    Cookies.remove("auth_token")
+    await signOut({ callbackUrl:"/auth/signin" })
+    router.push("/auth/signin")
+  }
+
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -29,12 +46,12 @@ export default function UserMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>Settings</DropdownMenuItem>
-        <DropdownMenuItem>Support</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>Logout</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
+
+
+
+
