@@ -147,7 +147,7 @@ export const apiSlice = createApi({
         deleteSeverity: builder.mutation<any, string>({
             query: (severityId) => ({
                 url: `/severity/${severityId}`, // Assuming '/task/:id' is the delete route
-                method: 'PUT',
+                method: 'DELETE',
             }),
         }),
         // Updated endpoint for creating a project with image upload and other fields

@@ -27,10 +27,7 @@ import { Trash2Icon } from "lucide-react";
 const Severity = () => {
     const { data, isLoading, error, refetch } = useGetSeverityQuery({});
     const [createSeverity, { isLoading: severityLoading, isError: severityError }] = useCreateSeverityMutation();
-
-    const [deleteSeverity, { isLoading: deleteSverity }] = useDeleteSeverityMutation()
-
-
+    const [deleteSeverity, { isLoading: deleteSeverityLoading }] = useDeleteSeverityMutation();
 
     // State to store the new severity input
     const [severity, setSeverity] = useState("");
@@ -53,20 +50,25 @@ const Severity = () => {
         try {
             await createSeverity({ severityName: severity }).unwrap(); // Ensure mutation is awaited
             setSeverity(""); // Reset the input field after submission
-            refetch()
+            refetch(); // Refetch data to update the list
         } catch (error) {
             console.error("Failed to create severity", error);
         }
     };
 
-
-    const deleteSeverityHandler = async (severityId: string) => {
-        await deleteSeverity(severityId).unwrap()
-    }
-
+    // Handle delete severity action
+    const handleDelete = async (severityId: string) => {
+        try {
+            await deleteSeverity(severityId).unwrap(); // Ensure mutation is awaited
+            refetch(); // Refetch to update the list after deletion
+        } catch (error) {
+            console.error("Failed to delete severity", error);
+        }
+    };
 
     return (
         <div className="lg:px-20 sm:px-10 space-y-4">
+            {/* Create severity dialog */}
             <div className="flex justify-end items-center">
                 <Dialog>
                     <DialogTrigger asChild>
@@ -104,6 +106,7 @@ const Severity = () => {
                 </Dialog>
             </div>
 
+            {/* Severity table */}
             <Table className="bg-white">
                 <TableHeader>
                     <TableRow>
@@ -118,13 +121,13 @@ const Severity = () => {
                 <TableBody>
                     {isLoading ? (
                         <TableRow>
-                            <TableCell colSpan={5} className="text-center">
+                            <TableCell colSpan={6} className="text-center">
                                 Loading...
                             </TableCell>
                         </TableRow>
                     ) : error ? (
                         <TableRow>
-                            <TableCell colSpan={5} className="text-center text-red-500">
+                            <TableCell colSpan={6} className="text-center text-red-500">
                                 Error loading severity data
                             </TableCell>
                         </TableRow>
@@ -142,7 +145,14 @@ const Severity = () => {
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex justify-center items-center gap-6">
-                                        <Trash2Icon />
+                                        <Button
+                                            variant="outline"
+                                            color="red"
+                                            onClick={() => handleDelete(item._id)}
+                                            disabled={deleteSeverityLoading}
+                                        >
+                                             <Trash2Icon />
+                                        </Button>
                                     </div>
                                 </TableCell>
                             </TableRow>
