@@ -27,7 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Currency from "@/components/currancy";
-import { useGetAllProductsQuery, useGetProjectCountsQuery, useGetTotalCountsQuery, useLazyGetReportQuery } from "@/store/services/apiSlice";
+import { useGetAllProductsQuery, useGetAllTaskQuery, useGetProjectCountsQuery, useGetTotalCountsQuery, useLazyGetReportQuery, useLazyGetSummaryReportQuery } from "@/store/services/apiSlice";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 
@@ -35,9 +35,19 @@ export default function Dashboard() {
 
   const [triggerGetReport] = useLazyGetReportQuery();
 
+  const [triggerSummary] = useLazyGetSummaryReportQuery();
+
 
   const { data, isLoading } = useGetTotalCountsQuery();
   const { data: projectData, isLoading: projectLoading } = useGetAllProductsQuery();
+
+
+  const { data: taskData } = useGetAllTaskQuery()
+
+
+  useEffect(() => {
+    console.log(taskData)
+  }, [taskData])
 
 
 
@@ -75,6 +85,24 @@ export default function Dashboard() {
 
 
 
+  const handleDownloadSummary = async () => {
+    try {
+      // Fetch the report summary
+      const reportSummary = await triggerSummary().unwrap();
+  
+      if (reportSummary.fileUrl) {
+        console.log(reportSummary.fileUrl); // Log the fileUrl for debugging
+  
+        // Open the fileUrl in another page
+        window.open(reportSummary.fileUrl, '_blank');
+      } else {
+        console.error("No file URL received in the response.");
+      }
+    } catch (error) {
+      console.error("Error fetching the summary:", error);
+    }
+  };
+  
 
 
   return (
@@ -83,6 +111,7 @@ export default function Dashboard() {
         <Input type="date" onChange={(e) => setMonth(e.target.value)} />
         <Input type="date" onChange={(e) => setEndDate(e.target.value)} />
         <Button onClick={handleDownloadReport}>Download Report</Button>
+        <Button onClick={handleDownloadSummary}>Download Summary</Button>
       </div>
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         <Card x-chunk="dashboard-01-chunk-0">
@@ -187,76 +216,30 @@ export default function Dashboard() {
         </Card>
         <Card x-chunk="dashboard-01-chunk-5">
           <CardHeader>
-            <CardTitle>Recent Sales</CardTitle>
+            <CardTitle>Recent Task</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-8">
-            <div className="flex items-center gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/avatars/01.png" alt="Avatar" />
-                <AvatarFallback>OM</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">
-                  Olivia Martin
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  olivia.martin@email.com
-                </p>
-              </div>
-              <div className="ml-auto font-medium">+$1,999.00</div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/avatars/02.png" alt="Avatar" />
-                <AvatarFallback>JL</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">Jackson Lee</p>
-                <p className="text-sm text-muted-foreground">
-                  jackson.lee@email.com
-                </p>
-              </div>
-              <div className="ml-auto font-medium">+$39.00</div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/avatars/03.png" alt="Avatar" />
-                <AvatarFallback>IN</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">
-                  Isabella Nguyen
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  isabella.nguyen@email.com
-                </p>
-              </div>
-              <div className="ml-auto font-medium">+$299.00</div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/avatars/04.png" alt="Avatar" />
-                <AvatarFallback>WK</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">William Kim</p>
-                <p className="text-sm text-muted-foreground">will@email.com</p>
-              </div>
-              <div className="ml-auto font-medium">+$99.00</div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/avatars/05.png" alt="Avatar" />
-                <AvatarFallback>SD</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">Sofia Davis</p>
-                <p className="text-sm text-muted-foreground">
-                  sofia.davis@email.com
-                </p>
-              </div>
-              <div className="ml-auto font-medium">+$39.00</div>
-            </div>
+            {
+              taskData?.map((item, index) => {
+                return (
+                  <div className="flex items-center gap-4">
+                    <Avatar className="hidden h-9 w-9 sm:flex">
+                      <AvatarImage src="/avatars/01.png" alt="Avatar" />
+                      <AvatarFallback>OM</AvatarFallback>
+                    </Avatar>
+                    <div className="grid gap-1">
+                      <p className="text-sm font-medium leading-none">
+                        {item?.taskName}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {item?.taskDescription}
+                      </p>
+                    </div>
+                    <div className="ml-auto font-medium">{item?.taskStartDate}</div>
+                  </div>
+                )
+              })
+            }
           </CardContent>
         </Card>
       </div>

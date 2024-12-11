@@ -47,6 +47,12 @@ export const apiSlice = createApi({
             })
         }),
 
+        getSummaryReport:builder.query<any, void>({
+            query: () => ({
+                url: "/summary"
+            })
+        }),
+
         getAllTask: builder.query<any, void>({
             query: () => '/tasks',
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {
@@ -225,5 +231,6 @@ export const {
     useDeleteProjectMutation,
     useLazyGetReportQuery,
     useGetTotalCountsQuery,
-    useGetProjectCountsQuery
+    useGetProjectCountsQuery,
+    useLazyGetSummaryReportQuery
 } = apiSlice;
