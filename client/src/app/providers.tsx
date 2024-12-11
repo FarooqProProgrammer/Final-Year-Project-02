@@ -1,8 +1,10 @@
 "use client";
 
-import { createContext, Dispatch, SetStateAction, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Order } from "@/types/orders";
 import { ToastContainer } from "react-toastify";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export const SelectedOrderContext = createContext<
   ReturnType<typeof useState<Order | undefined>>
@@ -14,6 +16,16 @@ export const SelectedOrderProvider = ({
   children: React.ReactNode;
 }) => {
   const store = useState<Order | undefined>(undefined);
+  const router = useRouter()
+
+
+  useEffect(()=>{
+
+    let token = Cookies.get("auth_token");
+
+    if(!token) return router.push("/auth/signin")
+
+  },[])
 
   return (
     <SelectedOrderContext.Provider value={store}>
