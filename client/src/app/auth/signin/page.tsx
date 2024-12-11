@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';  // Import the toast function
 import 'react-toastify/dist/ReactToastify.css'; // Import the styles
 import Cookies from 'js-cookie';  // Import js-cookie
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 // Define the form data interface
 interface FormValues {
@@ -105,6 +106,7 @@ const Login: React.FC = () => {
                     <div className="grid w-full max-w-sm items-center gap-1.5">
                         <Button type="submit">Sign In</Button>
                     </div>
+                    <Link href="/auth/signup">Signup</Link>
                 </form>
             </div>
         </div>

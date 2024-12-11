@@ -14,6 +14,7 @@ interface FormValues {
   username: string;
   email: string;
   password: string;
+  avatar:File
 }
 
 const Register: React.FC = () => {
@@ -105,6 +106,24 @@ const Register: React.FC = () => {
               <p className="text-red-500 text-sm">{errors.password.message}</p>
             )}
           </div>
+
+
+          <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="password">Image</Label>
+            <Input
+              type="file"
+              id="file"
+              placeholder="Password"
+              {...register('avatar', {
+                required: 'Password is required',
+                
+              })}
+            />
+            {errors.avatar && (
+              <p className="text-red-500 text-sm">{errors.avatar.message}</p>
+            )}
+          </div>
+
 
           {/* Submit Button */}
           <div className="grid w-full max-w-sm items-center gap-1.5">
