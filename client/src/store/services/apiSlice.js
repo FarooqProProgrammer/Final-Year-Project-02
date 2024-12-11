@@ -22,7 +22,7 @@ export const apiSlice = createApi({
                 body: newItem,
             }),
         }),
-        
+
         loginForm: builder.mutation({
             query: (newItem) => ({
                 url: "/auth/login",
@@ -31,7 +31,19 @@ export const apiSlice = createApi({
             }),
         }),
 
+        getAllUsers: builder.query({
+            query: () => ({
+                url: "/auth/get-all-users"
+            })
+        })
+
     }),
 });
 
-export const { useGetItemsQuery, useAddItemMutation,useRegisterFormMutation,useLoginFormMutation } = apiSlice;
+export const {
+    useGetItemsQuery,
+    useAddItemMutation,
+    useRegisterFormMutation,
+    useLoginFormMutation,
+    useGetAllUsersQuery
+} = apiSlice;

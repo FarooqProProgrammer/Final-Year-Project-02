@@ -1,8 +1,31 @@
+import { StatusCodes } from "http-status-codes";
 import ProjectModel from "../models/Project.js";
+import { projectValidation } from "../validationSchema/index.js";
+import Joi from "joi";
 
 export const createProject = async (req, res) => {
     try {
-        const { projectTitle, severity, startDate, endDate, projectStatus, assignee, userId } = req.body;
+        const { title, startDate, endDate, tags, assignee, userId } = req.body;
+
+        const schema = Joi.object({
+            title: Joi.string().min(3).max(100).required(),
+            startDate: Joi.date().required(),
+            endDate: Joi.date().min(Joi.ref('startDate')).required(), // Ensure endDate is not before startDate
+            tags: Joi.required(), // Assign is required // Tags can be optional
+            assign: Joi.required(), // Assign is required
+            userId: Joi.string().required(),
+        });
+    
+
+        const { error } = schema.validate(req.body, { abortEarly: false });
+
+        if (error) {
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message: "Validation error",
+                errors: error.details.map((detail) => detail.message),
+            });
+        }
+
 
         console.log(req.body)
 
@@ -14,11 +37,10 @@ export const createProject = async (req, res) => {
         }
 
         const newProject = new ProjectModel({
-            projectTitle,
-            severity,
+            title,
+            tags,
             startDate,
             endDate,
-            projectStatus,
             assignee,
             userId,
             projectImage: projectImageUrl, // Save the image URL to MongoDB
@@ -79,7 +101,7 @@ export const updateProject = async (req, res) => {
         const { projectTitle, severity, startDate, endDate, projectStatus, assignee, userId } = req.body;
 
 
-        console.log({...req.body,projectId})
+        console.log({ ...req.body, projectId })
 
         // Find the project by its ID
         const project = await ProjectModel.findById(projectId);
@@ -131,15 +153,15 @@ export const getAllProjects = async (req, res) => {
 
 export const getSingle = async (req, res) => {
     try {
-        
+
 
         const id = req.params.id;
 
-        const projects = await ProjectModel.find({ _id:id })
-            .populate('userId', 'username email') 
-            .exec(); 
+        const projects = await ProjectModel.find({ _id: id })
+            .populate('userId', 'username email')
+            .exec();
 
-       
+
         if (!projects.length) {
             return res.status(404).json({ message: 'No projects found' });
         }
@@ -156,7 +178,7 @@ export const getSingle = async (req, res) => {
 export const deleteManyProjects = async (req, res) => {
     try {
 
-        
+
         const { ids } = req.body; // Expect an array of project IDs to delete
 
         if (!Array.isArray(ids) || ids.length === 0) {

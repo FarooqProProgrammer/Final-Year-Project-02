@@ -6,7 +6,7 @@ mongoose.plugin(slug);
 
 const projectSchema = new mongoose.Schema(
   {
-    projectTitle: {
+    title: {
       type: String,
       required: true,
     },
@@ -15,24 +15,22 @@ const projectSchema = new mongoose.Schema(
       slug: "projectTitle",
       unique: true, // Ensures the slug is unique
     },
-    severity: {
-      type: String,
-      required: true,
-    },
     startDate: {
-      type: String,
+      type: Date,
       required: true,
     },
     endDate: {
-      type: String,
+      type: Date,
       required: true,
     },
-    projectStatus: {
-      type: String,
+ 
+    tags: {
+      type: Array,
       required: true,
     },
-    assignee: {
-      type: String,
+    assign: {
+      type: Array,
+      required: true,
     
     },
     userId: {

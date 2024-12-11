@@ -17,11 +17,24 @@ import { ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
 import Loading from "@/components/Loading";
 import { motion, AnimatePresence } from "framer-motion";
+import Cookies from "js-cookie"
+
+
+
 const Layout = () => {
   const { width, breakpoints } = useWidth();
   const [collapsed] = useSidebar();
   const navigate = useNavigate();
   const { isAuth } = useSelector((state) => state.auth);
+
+
+
+  useEffect(()=>{
+    let AuthToken = Cookies.get('auth_token')
+    if(!AuthToken){
+      navigate("/")
+    }
+  },[])
 
 
 

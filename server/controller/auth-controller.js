@@ -117,7 +117,20 @@ const getAllUserDetails = asyncHandler(async (req, res) => {
         return userObj;
     });
 
-    res.status(StatusCodes.OK).json({ users: usersWithoutPassword });
+    let mapUsers = usersWithoutPassword?.map((item,index)=>{
+        return { 
+            value:item._id.toString(),
+            label:item.username,
+            image:'http://localhost:3001'+item.avatar
+        }
+    })
+
+
+    console.log(mapUsers)
+
+
+
+    res.status(StatusCodes.OK).json({ users: usersWithoutPassword ,options:mapUsers});
 });
 
 // Logout user
