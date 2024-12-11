@@ -37,6 +37,7 @@
     </style>
 </head>
 <body>
+    <h2>Complete Task Report</h2>
     <table class="table">
         <thead>
             <tr>
@@ -50,18 +51,23 @@
             </tr>
         </thead>
         <tbody>
-            <% tableData.forEach(function(item, index) { %>
+            <% if (tableData.length > 0) { %>
+                <% tableData.forEach(function(item, index) { %>
+                    <tr>
+                        <td><%= index + 1 %></td>
+                        <td><%= item.taskName %></td>
+                        <td><%= item.taskStatus %></td>
+                        <td><%= item.project.projectTitle %></td>
+                        <td><%= item.project.severity %></td>
+                        <td><%= item.module %></td>
+                        <td><%= item.taskStartDate %> - <%= item.taskEndDate %></td>
+                    </tr>
+                <% }) %>
+            <% } else { %>
                 <tr>
-                    <td><%= index %></td>
-                    <td><%= item.taskName %></td>
-                    <td><%= item.taskStatus %></td>
-                    <td><%= item.project.projectTitle %></td>
-                    <td><%= item.project.severity %></td>
-                    <td><%= item.module %></td>
-                    <td><%= item.fromDate %> - <%= item.toDate %></td>
-
+                    <td colspan="7" style="text-align: center;">No Report Found</td>
                 </tr>
-            <% }) %>
+            <% } %>
         </tbody>
     </table>
 </body>

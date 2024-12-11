@@ -33,12 +33,13 @@ export const apiSlice = createApi({
             query: () => '/get-all-project',  // Using the route '/get-all-project'
         }),
 
-        getReport: builder.query<any, void>({
-            query: () => ({
-                url: '/get-report',
-                responseType: 'blob', // Ensure the response is treated as a binary file
+        getReport: builder.query<any, { month: string; endDate: string }>({
+            query: ({ month, endDate }) => ({
+                url: `/get-report?date=${month}&endDate=${endDate}`, // Proper query string concatenation
+                responseType: 'blob', // Handle binary file response
             }),
         }),
+
 
         getTotalCounts: builder.query<any, void>({
             query: () => ({
@@ -141,7 +142,7 @@ export const apiSlice = createApi({
             query: ({ severityName }) => ({
                 url: '/create-severity', // This should match your route
                 method: 'POST',
-                body: {Severity:severityName},
+                body: { Severity: severityName },
             }),
         }),
         deleteSeverity: builder.mutation<any, string>({

@@ -28,7 +28,8 @@ import {
 } from "@/components/ui/table";
 import Currency from "@/components/currancy";
 import { useGetAllProductsQuery, useGetProjectCountsQuery, useGetTotalCountsQuery, useLazyGetReportQuery } from "@/store/services/apiSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Input } from "@/components/ui/input";
 
 export default function Dashboard() {
 
@@ -38,15 +39,26 @@ export default function Dashboard() {
   const { data, isLoading } = useGetTotalCountsQuery();
   const { data: projectData, isLoading: projectLoading } = useGetAllProductsQuery();
 
-  useEffect(() => {
-    console.log(projectData)
-  }, [projectData])
+
+
+
+  const [month, setMonth] = useState<string | null>(null)
+  const [endDate, setEndDate] = useState<string | null>(null)
+
 
 
   const handleDownloadReport = async () => {
     try {
+
+      if (!month || !endDate) {
+        console.error("Please select a month.");
+        return;
+      }
+
+
+
       // Make the API call to fetch the report
-      const response = await triggerGetReport().unwrap();
+      const response = await triggerGetReport({ month, endDate }).unwrap();
       console.log(response.fileUrl); // Ensure that the fileUrl is present in the response
 
       // Create an anchor element
@@ -67,7 +79,9 @@ export default function Dashboard() {
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-      <div>
+      <div className="flex sm:max-w-lg justify-start items-center gap-4">
+        <Input type="date" onChange={(e) => setMonth(e.target.value)} />
+        <Input type="date" onChange={(e) => setEndDate(e.target.value)} />
         <Button onClick={handleDownloadReport}>Download Report</Button>
       </div>
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
@@ -152,17 +166,17 @@ export default function Dashboard() {
                       <TableRow key={index}>
                         <TableCell>
                           <div className="hidden text-sm text-muted-foreground md:inline">
-                          {item?.projectTitle}
+                            {item?.projectTitle}
                           </div>
                         </TableCell>
                         <TableCell></TableCell>
                         <TableCell className="text-end">
                           <div className="hidden   text-sm text-muted-foreground md:inline">
-                          {item?.endDate}
+                            {item?.endDate}
                           </div>
                         </TableCell>
 
-                
+
                       </TableRow>
                     )
                   })

@@ -12,14 +12,32 @@ const reportRouter = express.Router();
 
 reportRouter.get("/get-report", async (req, res) => {
     try {
-        const tasks = await Task.find().populate("assignee").populate("project");
+        const { date, endDate } = req.query;
 
-        // Format the dates in the backend
-        const tableData = tasks.map(task => ({
-            ...task.toObject(),
-            fromDate: task.fromDate ? new Date(task.createdAt).toISOString().split("T")[0] : "N/A",
-            toDate: task.toDate ? new Date(task.createdAt).toISOString().split("T")[0] : "N/A",
-        }));
+        // Validate input dates
+        if (!date || !endDate) {
+          return res.status(400).json({ message: "Start date and end date are required." });
+        }
+    
+        // Convert string dates from query to Date objects for comparison
+        const startDate = new Date(date);
+        const endDateObj = new Date(endDate);
+    
+        // Ensure dates are valid
+        if (isNaN(startDate) || isNaN(endDateObj)) {
+          return res.status(400).json({ message: "Invalid date format. Please use YYYY-MM-DD." });
+        }
+    
+        // Query the tasks with date range filtering
+        const tableData = await Task.find({
+          taskStartDate: {
+            $gte: startDate.toISOString().split("T")[0],  // Ensure we are comparing date strings only (YYYY-MM-DD)
+            $lte: endDateObj.toISOString().split("T")[0],  // Same for the end date
+          },
+        }).populate("assignee").populate("project");
+    
+        console.log(tableData);
+    
 
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
