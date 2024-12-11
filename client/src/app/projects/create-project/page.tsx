@@ -2,10 +2,10 @@
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { useCreateProjectMutation, useGetAllUserDetailsQuery, useGetUsersQuery } from '@/store/services/apiSlice';
+import { useCreateProjectMutation, useGetAllUserDetailsQuery } from '@/store/services/apiSlice';
 import { useRouter } from 'next/navigation';
 
 interface FormValues {
@@ -21,31 +21,31 @@ interface FormValues {
 
 const CreateProject: React.FC = () => {
     // Initialize React Hook Form
-    const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormValues>();
-    const [createProject, { isLoading, isSuccess, isError, error }] = useCreateProjectMutation();
-
-    const { data: usersData } = useGetAllUserDetailsQuery()
-    const router = useRouter()
+    const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm<FormValues>();
+    const [createProject, { isLoading, isSuccess }] = useCreateProjectMutation();
+    const { data: usersData } = useGetAllUserDetailsQuery();
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        console.log(usersData)
-    }, [usersData])
-
-
+        console.log(usersData);
+    }, [usersData]);
 
     // Handle form submission
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
-        console.log(data);
+        setLoading(true);
+        try {
+            const response = await createProject(data).unwrap();
+            console.log(response);
 
-
-
-
-        const response = await createProject(data).unwrap();
-
-        console.log(isSuccess)
-
-        if (isSuccess) {
-            router.push("/projects")
+            if (isSuccess) {
+                router.push("/projects");
+                reset(); // Reset the form fields
+            }
+        } catch (error) {
+            console.error("Form submission failed:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -133,29 +133,25 @@ const CreateProject: React.FC = () => {
                 {/* User ID */}
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label>User ID</Label>
-                    {/* <Input
-                        type="text"
-                        placeholder="Enter User ID"
-                        defaultValue={'6756a2cad5c4c919f6084abc'}
-                        value={'6756a2cad5c4c919f6084abc'}
-                        {...register('userId', { required: 'User ID is required' })}
-                    /> */}
-                    <select {...register('userId', { required: 'User ID is required' })} id="">
-                        {
-                            usersData?.users?.map((item, index) => {
-                                return (
-                                    <option value={item?._id}>{item?.username}</option>
-                                )
-                            })
-                        }
+                    <select {...register('userId', { required: 'User ID is required' })}>
+                        {usersData?.users?.map((item) => (
+                            <option key={item?._id} value={item?._id}>
+                                {item?.username}
+                            </option>
+                        ))}
                     </select>
                     {errors.userId && <p className="text-red-500 text-sm">{errors.userId.message}</p>}
                 </div>
-
-                {/* Submit Button */}
             </div>
-            <div className='mt-4'>
-                <Button type="submit" onClick={handleSubmit(onSubmit)}>Submit</Button>
+            {/* Submit Button */}
+            <div className="mt-4">
+                <Button
+                    type="submit"
+                    onClick={handleSubmit(onSubmit)}
+                    disabled={loading}
+                >
+                    {loading ? "Submitting..." : "Submit"}
+                </Button>
             </div>
         </div>
     );

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
 import {
   Table,
@@ -10,7 +10,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useGetAllProductsQuery, useDeleteProjectMutation, useUpdateProjectMutation } from "@/store/services/apiSlice";
+import {
+  useGetAllProductsQuery,
+  useDeleteProjectMutation,
+  useUpdateProjectMutation,
+} from "@/store/services/apiSlice";
 import { PencilIcon, Trash2 } from "lucide-react";
 import {
   Dialog,
@@ -36,11 +40,27 @@ const Projects = () => {
   const [projectStatus, setProjectStatus] = useState("");
   const [updateResponse, setUpdateResponse] = useState<string | null>(null);
 
+  // State for filtering
+  const [filter, setFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState(""); // New state for status filter
+  const [filteredProjects, setFilteredProjects] = useState([]);
+
   const router = useRouter();
 
   useEffect(() => {
-    console.log(data);
-  }, [data]);
+    if (data?.projects) {
+      setFilteredProjects(
+        data.projects.filter((project) => {
+          const matchesTitle = project.projectTitle
+            .toLowerCase()
+            .includes(filter.toLowerCase());
+          const matchesStatus =
+            !statusFilter || project.projectStatus === statusFilter;
+          return matchesTitle && matchesStatus;
+        })
+      );
+    }
+  }, [data, filter, statusFilter]);
 
   const handleDeleteProduct = async (id: string) => {
     try {
@@ -63,7 +83,6 @@ const Projects = () => {
   };
 
   const handleSubmitUpdate = async () => {
-    // Convert startDate and endDate to string format if they are date objects
     const formattedStartDate = new Date(startDate).toISOString();
     const formattedEndDate = new Date(endDate).toISOString();
 
@@ -79,7 +98,6 @@ const Projects = () => {
       await updateProduct(updatedProduct).unwrap();
       setUpdateResponse("Project updated successfully!");
       refetch();
-      console.log("Update Response:", updatedProduct);
     } catch (error) {
       setUpdateResponse("Failed to update project. Please try again.");
       console.error("Error updating project:", error);
@@ -88,7 +106,24 @@ const Projects = () => {
 
   return (
     <section className="lg:px-20 sm:px-10 space-y-4">
-      <div className="flex justify-end items-center">
+      <div className="flex justify-between items-center gap-4">
+        <Input
+          type="text"
+          placeholder="Filter by project title"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="max-w-sm"
+        />
+        <select
+          className="max-w-xs p-2 border rounded"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="">All Statuses</option>
+          <option value="active">Active</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
+        </select>
         <Button onClick={() => router.push("/projects/create-project")}>
           Create Project
         </Button>
@@ -105,12 +140,16 @@ const Projects = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data?.projects?.map((item, index) => (
+          {filteredProjects.map((item, index) => (
             <TableRow key={index}>
               <TableCell className="font-medium">{item?.projectTitle}</TableCell>
               <TableCell className="font-medium">{item?.severity}</TableCell>
-              <TableCell className="font-medium"> {new Date(item?.startDate).toLocaleDateString("en-US")}</TableCell>
-              <TableCell className="font-medium">{new Date(item?.endDate).toLocaleDateString("en-US")}</TableCell>
+              <TableCell className="font-medium">
+                {new Date(item?.startDate).toLocaleDateString("en-US")}
+              </TableCell>
+              <TableCell className="font-medium">
+                {new Date(item?.endDate).toLocaleDateString("en-US")}
+              </TableCell>
               <TableCell className="font-medium">{item?.projectStatus}</TableCell>
               <TableCell className="font-medium flex justify-center items-center">
                 <div className="flex justify-center items-center gap-5">
@@ -124,7 +163,9 @@ const Projects = () => {
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Update Project {currentProduct?.projectTitle}</DialogTitle>
+                        <DialogTitle>
+                          Update Project {currentProduct?.projectTitle}
+                        </DialogTitle>
                         <DialogDescription>
                           <div className="grid w-full max-w-sm items-center gap-1.5">
                             <Label htmlFor="projectTitle">Project Title</Label>
@@ -168,19 +209,25 @@ const Projects = () => {
                           </div>
                           <div className="grid w-full max-w-sm items-center gap-1.5 mt-3">
                             <Label htmlFor="projectStatus">Project Status</Label>
-                            <Input
-                              type="text"
+                            <select
                               id="projectStatus"
-                              placeholder="Project Status"
                               value={projectStatus}
                               onChange={(e) => setProjectStatus(e.target.value)}
-                            />
+                              className="p-2 border rounded"
+                            >
+                              <option value="active">Active</option>
+                              <option value="pending">Pending</option>
+                              <option value="completed">Completed</option>
+                            </select>
                           </div>
+
                           <Button className="mt-4" onClick={handleSubmitUpdate}>
                             Submit
                           </Button>
                           {updateResponse && (
-                            <p className="mt-2 text-sm text-center">{updateResponse}</p>
+                            <p className="mt-2 text-sm text-center">
+                              {updateResponse}
+                            </p>
                           )}
                         </DialogDescription>
                       </DialogHeader>

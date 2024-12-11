@@ -115,31 +115,7 @@ const Projects = () => {
         />
       </div>
 
-      <div className="mt-4 flex gap-4">
-        {/* Start Date Filter */}
-        <div>
-          <Label htmlFor="startDate">Start Date</Label>
-          <Input
-            type="date"
-            id="startDate"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="w-1/4"
-          />
-        </div>
-
-        {/* End Date Filter */}
-        <div>
-          <Label htmlFor="endDate">End Date</Label>
-          <Input
-            type="date"
-            id="endDate"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="w-1/4"
-          />
-        </div>
-      </div>
+   
 
       <Table className="bg-white rounded-2xl mt-4">
         <TableHeader className="border-b-2 border-gray-600">
