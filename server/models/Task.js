@@ -32,6 +32,13 @@ const taskSchema = new mongoose.Schema(
             trim: true,  // Optional: Trim spaces for description
         },
         
+        taskImage: {
+            type: String,
+            trim: true,  // Optional: Trim spaces for description
+        },
+        
+
+        
         module: {
             type: String,
             required: true,

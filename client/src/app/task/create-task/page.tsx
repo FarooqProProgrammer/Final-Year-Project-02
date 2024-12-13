@@ -2,60 +2,62 @@
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useCreateTaskMutation, useGetAllProductsQuery, useGetAllUserDetailsQuery } from '@/store/services/apiSlice';
 import { useRouter } from 'next/navigation';
 import { Textarea } from '@/components/ui/textarea';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-  } from "@/components/ui/select"
 
-  
 interface FormValues {
     taskName: string;
     priority: string;
     taskStartDate: string;
     taskEndDate: string;
     taskStatus: string;
-    assignee: string;  // User will be assigned through this field
-    project: string;  // Optional if task is linked to a project
-    module?: string;  // Optional if task is linked to a project
-    taskDescription: string;  // New task description field
+    assignee: string; // User will be assigned through this field
+    project: string; // Optional if task is linked to a project
+    module?: string; // Optional if task is linked to a project
+    taskDescription: string; // New task description field
+    taskImage?: File; // Task image field
 }
 
 const CreateTask: React.FC = () => {
-    // Initialize React Hook Form
     const { register, handleSubmit, formState: { errors } } = useForm<FormValues>();
     const { data: usersData } = useGetAllUserDetailsQuery();
-    const { data } = useGetAllProductsQuery(); // Get all products, assuming projects are stored here
+    const { data } = useGetAllProductsQuery();
 
     const [createTask, { isLoading, isSuccess }] = useCreateTaskMutation();
-
     const router = useRouter();
+
+    const [taskImage, setTaskImage] = useState<File | null>(null);
 
     useEffect(() => {
         console.log(usersData);
     }, [usersData]);
 
-    // Handle form submission
-    const onSubmit: SubmitHandler<FormValues> = async (data) => {
-        console.log(data);
-
-
-        // Add your task creation logic here
+    const onSubmit: SubmitHandler<FormValues> = async (formData) => {
         try {
-            const response = await createTask(data).unwrap();
+            // Create a FormData object for the task creation request
+            const payload = new FormData();
+            payload.append("taskName", formData.taskName);
+            payload.append("priority", formData.priority);
+            payload.append("taskStartDate", formData.taskStartDate);
+            payload.append("taskEndDate", formData.taskEndDate);
+            payload.append("taskStatus", formData.taskStatus);
+            payload.append("assignee", formData.assignee);
+            payload.append("project", formData.project);
+            payload.append("module", formData.module || "");
+            payload.append("taskDescription", formData.taskDescription);
+
+            if (taskImage) {
+                payload.append("taskImage", taskImage); // Add the taskImage to FormData
+            }
+
+            const response = await createTask(payload).unwrap();
             console.log(response);
 
-            // Check for success
             if (isSuccess) {
-                // Redirect to the task list page after successful creation
                 router.push("/task");
             }
         } catch (error) {
@@ -63,9 +65,16 @@ const CreateTask: React.FC = () => {
         }
     };
 
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setTaskImage(file);
+        }
+    };
+
     return (
         <div className="sm:px-20">
-            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-3">
+            <form onSubmit={handleSubmit(onSubmit)} className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-3">
                 {/* Task Name */}
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label>Task Name</Label>
@@ -76,6 +85,8 @@ const CreateTask: React.FC = () => {
                     />
                     {errors.taskName && <p className="text-red-500 text-sm">{errors.taskName.message}</p>}
                 </div>
+
+                {/* Module */}
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label>Module</Label>
                     <Input
@@ -83,9 +94,8 @@ const CreateTask: React.FC = () => {
                         placeholder="Enter Module"
                         {...register('module', { required: 'Module Name is required' })}
                     />
-                    {errors.taskName && <p className="text-red-500 text-sm">{errors.taskName.message}</p>}
+                    {errors.module && <p className="text-red-500 text-sm">{errors.module.message}</p>}
                 </div>
-
 
                 {/* Priority */}
                 <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -141,25 +151,21 @@ const CreateTask: React.FC = () => {
                         className="input"
                     >
                         <option value="">Select Assignee</option>
-                        {
-                            usersData?.users?.map((item) => (
-                                <option key={item._id} value={item._id}>{item.username}</option>
-                            ))
-                        }
+                        {usersData?.users?.map((item) => (
+                            <option key={item._id} value={item._id}>{item.username}</option>
+                        ))}
                     </select>
                     {errors.assignee && <p className="text-red-500 text-sm">{errors.assignee.message}</p>}
                 </div>
 
-                {/* Project (Optional) */}
+                {/* Project */}
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label>Project</Label>
-                    <select {...register('project')}>
+                    <select {...register('project')} className="input">
                         <option value="">Select Project</option>
-                        {
-                            data?.projects?.map((item, index) => (
-                                <option key={item._id} value={item._id}>{item.projectTitle}</option>
-                            ))
-                        }
+                        {data?.projects?.map((item) => (
+                            <option key={item._id} value={item._id}>{item.projectTitle}</option>
+                        ))}
                     </select>
                 </div>
 
@@ -174,11 +180,17 @@ const CreateTask: React.FC = () => {
                     {errors.taskDescription && <p className="text-red-500 text-sm">{errors.taskDescription.message}</p>}
                 </div>
 
+                {/* Task Image */}
+                <div className="grid w-full max-w-sm items-center gap-1.5">
+                    <Label>Task Image</Label>
+                    <Input type="file" accept="image/*" onChange={handleFileChange} />
+                </div>
+
                 {/* Submit Button */}
-            </div>
-            <div className='mt-2'>
-                <Button type="submit" onClick={handleSubmit(onSubmit)} disabled={isLoading}>Submit</Button>
-            </div>
+                <div className="mt-2">
+                    <Button type="submit" disabled={isLoading}>Submit</Button>
+                </div>
+            </form>
         </div>
     );
 };

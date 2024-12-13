@@ -3,7 +3,10 @@ import Task from "../models/Task.js";
 // Create a new task
 export const createTask = async (req, res) => {
     try {
-        const { taskName,taskStartDate,taskEndDate, taskDescription,module, taskStatus, project, assignee } = req.body;
+        const { taskName, taskStartDate, taskEndDate, taskDescription, module, taskStatus, project, assignee } = req.body;
+
+        // Get the image path from the uploaded file
+        const taskImage = req.file ? req.file.path : null;
 
         const newTask = new Task({
             taskName,
@@ -13,7 +16,8 @@ export const createTask = async (req, res) => {
             assignee,
             module,
             taskStartDate,
-            taskEndDate
+            taskEndDate,
+            taskImage, // Save the image path
         });
 
         await newTask.save();

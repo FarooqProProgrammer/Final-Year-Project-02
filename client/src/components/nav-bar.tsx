@@ -17,6 +17,7 @@ import {
   Settings,
   Projector,
   BookAIcon,
+  User2Icon,
 } from "lucide-react";
 
 export default function NavBar() {
@@ -73,15 +74,16 @@ export default function NavBar() {
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
-              href="/severity"
+              href="/users"
               className={`flex h-9 w-9 items-center justify-center rounded-lg text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8 ${pathname === "/products" ? "bg-accent" : ""}`}
             >
-              <BookAIcon className="h-5 w-5" />
-              <span className="sr-only">Severity</span>
+              <User2Icon className="h-5 w-5" />
+              <span className="sr-only">Users</span>
             </Link>
           </TooltipTrigger>
-          <TooltipContent side="right">Severity</TooltipContent>
+          <TooltipContent side="right">User</TooltipContent>
         </Tooltip>
+     
 
 
       
