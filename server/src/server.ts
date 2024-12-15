@@ -10,6 +10,11 @@ import errorHandler from "@/common/middleware/errorHandler";
 import rateLimiter from "@/common/middleware/rateLimiter";
 import requestLogger from "@/common/middleware/requestLogger";
 import { env } from "@/common/utils/envConfig";
+import AuthRoute from "./api/routes/auth";
+import session from "express-session";
+
+
+
 
 const logger = pino({ name: "server start" });
 const app: Express = express();
@@ -20,9 +25,20 @@ app.set("trust proxy", true);
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static("uploads/"))
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
 app.use(helmet());
 app.use(rateLimiter);
+
+
+app.use(
+    session({
+        secret: process.env.SECRET_URL, // Replace with a proper secret key
+        resave: false,
+        saveUninitialized: false,
+        cookie: { secure: false }, // Use 'secure: true' if using HTTPS
+    })
+);
 
 // Request logging
 app.use(requestLogger);
@@ -30,6 +46,7 @@ app.use(requestLogger);
 // Routes
 app.use("/health-check", healthCheckRouter);
 app.use("/users", userRouter);
+app.use("/api/v1", AuthRoute)
 
 // Swagger UI
 app.use(openAPIRouter);
