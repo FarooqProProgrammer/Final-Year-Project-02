@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Select, { components } from "react-select";
 import Modal from "@/components/ui/Modal";
 import { useSelector, useDispatch } from "react-redux";
@@ -16,7 +16,6 @@ import avatar2 from "@/assets/images/avatar/av-2.svg";
 import avatar3 from "@/assets/images/avatar/av-3.svg";
 import avatar4 from "@/assets/images/avatar/av-4.svg";
 import FormGroup from "@/components/ui/FormGroup";
-import { useGetAllUsersQuery } from "../../../store/services/apiSlice";
 
 const styles = {
   multiValue: (base, state) => {
@@ -36,9 +35,12 @@ const styles = {
   }),
 };
 
-
-
-
+const assigneeOptions = [
+  { value: "mahedi", label: "Mahedi Amin", image: avatar1 },
+  { value: "sovo", label: "Sovo Haldar", image: avatar2 },
+  { value: "rakibul", label: "Rakibul Islam", image: avatar3 },
+  { value: "pritom", label: "Pritom Miha", image: avatar4 },
+];
 const options = [
   {
     value: "team",
@@ -89,15 +91,6 @@ const AddProject = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
-
-
-  const { data: AllUsers } = useGetAllUsersQuery();
-
-
-  useEffect(() => {
-    console.log(AllUsers)
-  }, [AllUsers])
-
   const FormValidationSchema = yup
     .object({
       title: yup.string().required("Title is required"),
@@ -137,10 +130,6 @@ const AddProject = () => {
       des: "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint.",
       progress: Math.floor(Math.random() * (100 - 10 + 1) + 10),
     };
-
-    console.log(data)
-
-    return
 
     dispatch(pushProject(project));
     dispatch(toggleAddModal(false));
@@ -227,7 +216,7 @@ const AddProject = () => {
               render={({ field }) => (
                 <Select
                   {...field}
-                  options={AllUsers?.options}
+                  options={assigneeOptions}
                   styles={styles}
                   className="react-select"
                   classNamePrefix="select"
@@ -272,21 +261,6 @@ const AddProject = () => {
             )}
           </div>
           <Textarea label="Description" placeholder="Description" />
-
-          <div>
-          
-            <Textinput 
-            
-                name="projectImage"
-                label="Project Image"
-                placeholder="Project Name"
-                register={register}
-                type="file"
-          
-            
-            />
-          </div>
-
 
           <div className="ltr:text-right rtl:text-left">
             <button className="btn btn-dark  text-center">Add</button>
