@@ -11,6 +11,7 @@ import { handleLogin } from "./store";
 import { useLoginFormMutation } from "../../../store/services/apiSlice";
 import Cookies from "js-cookie"
 import toast from "react-hot-toast";
+import CryptoJS from "crypto-js";
 
 
 
@@ -52,6 +53,12 @@ const LoginForm = () => {
       if(response?.token) { 
         Cookies.set('auth_token', response.token)
         toast.success("Login Success")
+      }
+
+      if (response?.id) {
+        const secretKey = "your-secret-key"; // Choose a secure key for encryption
+        const encryptedId = CryptoJS.AES.encrypt(response.id, secretKey).toString();
+        localStorage.setItem("user_id", encryptedId); // Save encrypted id
       }
 
       setTimeout(()=>{

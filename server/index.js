@@ -27,7 +27,7 @@ const app = express();
 // MongoDB session store setup using connect-mongo
 app.set('trust proxy', 1);
 app.use(session({
-    secret: process.env.SESSION_SECRET, // Secret for session encryption
+    secret: process.env.JWT_SECRET, // Secret for session encryption
     resave: false,
     saveUninitialized: true,
     cookie: {

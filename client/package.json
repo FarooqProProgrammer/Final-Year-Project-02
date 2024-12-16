@@ -27,6 +27,7 @@
     "apexcharts": "^3.36.3",
     "chart.js": "^4.2.0",
     "cleave.js": "^1.6.0",
+    "crypto-js": "^4.2.0",
     "d3-array": "^3.2.2",
     "dayjs": "^1.11.7",
     "framer-motion": "^10.12.12",

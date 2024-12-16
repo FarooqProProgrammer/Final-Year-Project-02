@@ -12,7 +12,7 @@ const projectSchema = new mongoose.Schema(
     },
     slug: {
       type: String,
-      slug: "projectTitle",
+      slug: "title",
       unique: true, // Ensures the slug is unique
     },
     startDate: {
@@ -36,10 +36,10 @@ const projectSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-    
+      required: true,
     },
     projectImage: {
-      type: String,
+      type: [String],
       required: false,
     },
   },

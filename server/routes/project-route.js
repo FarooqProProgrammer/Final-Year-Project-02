@@ -36,7 +36,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage, fileFilter, limits: { fileSize: 10 * 1024 * 1024 } })
 
 
-projectRouter.post("/create-project", upload.single("projectImage"), createProject)
+projectRouter.post("/create-project", upload.array("projectImage"), createProject)
 projectRouter.put('/update-project/:projectId', updateProject);
 projectRouter.get("/get-all-project", getAllProjects)
 projectRouter.get("/get-all-project-count", getAllProjectCount)

@@ -1,49 +1,42 @@
 import { StatusCodes } from "http-status-codes";
 import ProjectModel from "../models/Project.js";
-import { projectValidation } from "../validationSchema/index.js";
-import Joi from "joi";
-
+import jwt from 'jsonwebtoken';
 export const createProject = async (req, res) => {
     try {
-        const { title, startDate, endDate, tags, assignee, userId } = req.body;
+        const { title, startDate, endDate, tags, assignee,userId } = req.body;
 
-        const schema = Joi.object({
-            title: Joi.string().min(3).max(100).required(),
-            startDate: Joi.date().required(),
-            endDate: Joi.date().min(Joi.ref('startDate')).required(), // Ensure endDate is not before startDate
-            tags: Joi.required(), // Assign is required // Tags can be optional
-            assign: Joi.required(), // Assign is required
-            userId: Joi.string().required(),
-        });
-    
 
-        const { error } = schema.validate(req.body, { abortEarly: false });
+        //  // Extract the token from the Authorization header
+        //  const AuthToken = req.headers.authorization;
+        //  if (!AuthToken) {
+        //      return res.status(401).json({ message: 'Authorization token is required' });
+        //  }
+ 
+        //  const token = AuthToken.split(" ")[1];
+ 
+        //  // Decode the token to get the user info
+        //  const decodedToken = jwt.verify(token,    process.env.JWT_SECRET); // Use your JWT_SECRET or key here
+        //  const userId = decodedToken._id; // Assuming the token contains the user _id
 
-        if (error) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                message: "Validation error",
-                errors: error.details.map((detail) => detail.message),
-            });
+
+
+      
+
+        const projectImages = req.files; // Array of uploaded files
+
+        // If files are uploaded, get their URLs
+        let projectImageUrls = [];
+        if (projectImages && projectImages.length > 0) {
+            projectImageUrls = projectImages.map((file) => `/uploads/${file.filename}`);
         }
-
-
-        console.log(req.body)
-
-
-        let projectImageUrl = '';
-        if (req.file) {
-            // If a file is uploaded, get its URL
-            projectImageUrl = `/uploads/${req.file.filename}`;
-        }
-
         const newProject = new ProjectModel({
             title,
             tags,
             startDate,
             endDate,
             assignee,
-            userId,
-            projectImage: projectImageUrl, // Save the image URL to MongoDB
+            userId:userId,
+            projectImage: projectImageUrls, // Save the image URL to MongoDB
         });
 
         await newProject.save();

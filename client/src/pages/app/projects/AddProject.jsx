@@ -9,14 +9,8 @@ import Flatpickr from "react-flatpickr";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { v4 as uuidv4 } from "uuid";
-
-import avatar1 from "@/assets/images/avatar/av-1.svg";
-import avatar2 from "@/assets/images/avatar/av-2.svg";
-import avatar3 from "@/assets/images/avatar/av-3.svg";
-import avatar4 from "@/assets/images/avatar/av-4.svg";
 import FormGroup from "@/components/ui/FormGroup";
-import { useGetAllUsersQuery } from "../../../store/services/apiSlice";
+import { useCreateProjectMutation, useGetAllUsersQuery } from "../../../store/services/apiSlice";
 
 const styles = {
   multiValue: (base, state) => {
@@ -90,6 +84,9 @@ const AddProject = () => {
   const [endDate, setEndDate] = useState(new Date());
 
 
+  const [createProject, { isLoading }] = useCreateProjectMutation();
+
+
 
   const { data: AllUsers } = useGetAllUsersQuery();
 
@@ -125,27 +122,54 @@ const AddProject = () => {
     mode: "all",
   });
 
-  const onSubmit = (data) => {
-    const project = {
-      id: uuidv4(),
-      name: data.title,
-      assignee: data.assign,
-      // get only data value from startDate and endDate
-      category: null,
-      startDate: startDate.toISOString().split("T")[0],
-      endDate: endDate.toISOString().split("T")[0],
-      des: "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint.",
-      progress: Math.floor(Math.random() * (100 - 10 + 1) + 10),
-    };
+  const onSubmit = async (data) => {
+    const formData = new FormData();
 
-    console.log(data)
+    const secretKey = "your-secret-key";
+    const encryptedId = localStorage.getItem("user_id");
+
+    let decryptedId;
+    if (encryptedId) { 
+      const bytes = CryptoJS.AES.decrypt(encryptedId, secretKey);
+      decryptedId = bytes.toString(CryptoJS.enc.Utf8); // Get the decrypted ID
+    }
+
+    // Add non-file fields to the FormData
+    formData.append("title", data.title);
+    formData.append("assignee", JSON.stringify(data.assign)); // Assuming assign is an array of users
+    formData.append("tags", JSON.stringify(data.tags)); // Assuming tags is an array
+    formData.append("startDate", startDate.toISOString().split("T")[0]);
+    formData.append("endDate", endDate.toISOString().split("T")[0]);
+    formData.append("description", "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint.");
+    formData.append("progress", Math.floor(Math.random() * (100 - 10 + 1) + 10));
+    formData.append("userId", decryptedId);
+
+    // If you have a project image or other files, append them here
+    const projectImages = data.projectImage;
+    // if (projectImages) {
+    //   // Loop through each file and append it to formData
+    //   for (let i = 0; i < projectImages.length; i++) {
+    //     formData.append("projectImages", projectImages[i]);
+    //   }
+    // }
+
+    formData.append("projectImages", projectImages);
+    // Optional: Log FormData content for debugging (you can check this in the browser console)
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+
+
+    const response = await createProject(formData).unwrap();
+
+    console.log(response)
+
 
     return
-
-    dispatch(pushProject(project));
     dispatch(toggleAddModal(false));
     reset();
   };
+
 
   return (
     <div>
@@ -274,16 +298,17 @@ const AddProject = () => {
           <Textarea label="Description" placeholder="Description" />
 
           <div>
-          
-            <Textinput 
-            
-            name="projectImage"
-            label="Project Image"
-            placeholder="Project Name"
-            register={register}
-            type="file"
-          
-            
+
+            <Textinput
+
+              name="projectImage"
+              label="Project Image"
+              placeholder="Project Name"
+              register={register}
+              type="file"
+              multiple
+
+
             />
           </div>
 
